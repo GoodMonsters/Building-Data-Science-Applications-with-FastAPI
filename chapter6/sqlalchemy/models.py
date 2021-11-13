@@ -5,10 +5,20 @@ import sqlalchemy
 from pydantic import BaseModel, Field
 
 
-class PostBase(BaseModel):
-    title: str
-    content: str
-    publication_date: datetime = Field(default_factory=datetime.now)
+class EmployeeBase(BaseModel):
+    lastName: str
+    firstName: str
+    groupId: int
+    roleId: int
+    directReports: bool
+class ManagerBase(BaseModel):
+    groupId: int
+    managerId: int
+class RoleBase(BaseModel):
+    roleId: int
+    roleName: str
+
+
 
 
 class PostPartialUpdate(BaseModel):
@@ -16,22 +26,43 @@ class PostPartialUpdate(BaseModel):
     content: Optional[str] = None
 
 
-class PostCreate(PostBase):
+class EmployeeCreate(EmployeeBase):
+    pass
+class ManagerCreate(ManagerBase):
+    pass
+class RoleCreate(RoleBase):
     pass
 
 
-class PostDB(PostBase):
+class PostDB(EmployeeBase):
     id: int
 
 
 metadata = sqlalchemy.MetaData()
 
 
-posts = sqlalchemy.Table(
-    "posts",
+employees = sqlalchemy.Table(
+    "employees",
     metadata,
-    sqlalchemy.Column("id", sqlalchemy.Integer, primary_key=True, autoincrement=True),
-    sqlalchemy.Column("publication_date", sqlalchemy.DateTime(), nullable=False),
-    sqlalchemy.Column("title", sqlalchemy.String(length=255), nullable=False),
-    sqlalchemy.Column("content", sqlalchemy.Text(), nullable=False),
+    sqlalchemy.Column("employeeId", sqlalchemy.Integer, primary_key=True, autoincrement=True),
+    sqlalchemy.Column("lastName", sqlalchemy.String(length=45), nullable=False),
+    sqlalchemy.Column("firstName", sqlalchemy.String(length=45), nullable=False),
+    sqlalchemy.Column("groupId", sqlalchemy.Integer, nullable=False),
+    sqlalchemy.Column("roleId", sqlalchemy.Integer, nullable=False),
+    sqlalchemy.Column("directReports", sqlalchemy.Boolean(), nullable=False),
 )
+
+managers = sqlalchemy.Table(
+    "managers",
+    metadata,
+    sqlalchemy.Column("groupId", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("managerId", sqlalchemy.Integer),
+)
+
+roles = sqlalchemy.Table(
+    "roles",
+    metadata,
+    sqlalchemy.Column("roleId", sqlalchemy.Integer, primary_key=True),
+    sqlalchemy.Column("roleName", sqlalchemy.String(length=45), nullable=False),
+)
+
